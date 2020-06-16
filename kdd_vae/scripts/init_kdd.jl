@@ -4,7 +4,7 @@
 cd("/mnt/lustre/helios-home/maskomic/Desktop/VAE/kdd_vae")
 using DrWatson
 @quickactivate("kdd_vae")
-include("scripts/init_kdd.jl")
+include(scriptsdir("init_kdd.jl"))
 """
 
 # inside kdd_vae project 
@@ -22,8 +22,8 @@ using CSV
 using BSON
 
 # include predefined functions
-include("functions.jl")
-include("run_me.jl")
+include(scriptsdir("functions.jl"))
+include(scriptsdir("run_me.jl"))
 
 # DATA
 #pulsars = CSV.read(datadir("datasets","htru2.csv"))

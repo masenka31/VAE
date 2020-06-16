@@ -1,10 +1,10 @@
 # skript for running the experiment
 all_parameters = Dict(
-    "run_id" => 1,#[1,2,3,4],
+    "run_id" => 4,#[1,2,3,4],
     "nx" => 22,
     "nz" => [2,6,10],
-    "nh" => [2,10,30],
-    "η"  => [0.01, 0.00001],
+    "nh" => [10,30],
+    "η"  => [0.001],
     "opts" => [ADAM, RMSProp],
     "activ" => [σ, swish],
     "s" => [1, 0.1, 10]        
@@ -12,7 +12,7 @@ all_parameters = Dict(
 
 for j in 1:size(dict_list(all_parameters),1)
     par = dict_list(all_parameters)[j]
-    run_exp(par,dataT,30) 
+    run_exp(par,dataT,50) 
 end
 
 
