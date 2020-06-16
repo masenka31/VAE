@@ -1,2 +1,2 @@
-This is an awesome new scientific project that uses `DrWatson`!
+This is a project using VAE for anomaly detection on HTRU2 dataset. This project is managed by `DrWatson`.
 
