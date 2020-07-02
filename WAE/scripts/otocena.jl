@@ -12,7 +12,7 @@ opt = Flux.ADAM(1e-2)
 ps = Flux.params(A, μ, logσ, f)
 # s = 1
 
-k = 1
+k = 201
 for r in 1:4
     @time for i in k:k+49
         Flux.train!(loss,ps,data_train,opt)

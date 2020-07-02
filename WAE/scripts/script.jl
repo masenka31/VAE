@@ -46,7 +46,13 @@ include(scriptsdir("podkova.jl"))
 s = 1
 include(scriptsdir("podkova.jl"))
 include(scriptsdir("podkova.jl"))
-s = 0.1
+s = 0.01
 include(scriptsdir("podkova.jl"))
 include(scriptsdir("podkova.jl"))
 
+bl =[:A,:f,:logσ,:μ,:path,:opt]
+res = collect_results!(datadir("res_normalni"),black_list=bl)
+res[!,[:dst,:e,:s]] 
+
+dc = BSON.load(datadir(""))
+@unpack dst,s,γ,A,μ,logσ,f,opt,test,rec = dc
