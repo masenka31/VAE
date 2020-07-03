@@ -12,7 +12,7 @@ using BSON
 using DataFrames
 
 ndat = 500
-# X = rand(MvNormal([3;5],I),ndat)
+X = rand(MvNormal([3;5],I),ndat)
 X = rand(MvNormal([0;0],I),ndat)
 x = X[1,:]
 y = X[2,:]
