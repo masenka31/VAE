@@ -44,6 +44,5 @@ avg_s = evaluate_averages(res,:s,:auc_max)
 avg_nh = evaluate_averages(res,:nh,:auc_max)
 avg_opt = evaluate_averages(res,:opts,:auc_max)
 
-
 # finds entries with auc_max> 0.99  
 filter(:auc_max => x -> x > 0.99,dropmissing(res,:auc_max))

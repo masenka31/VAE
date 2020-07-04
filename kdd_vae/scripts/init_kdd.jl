@@ -10,8 +10,8 @@ include(scriptsdir("init_kdd.jl"))
 # inside kdd_vae project 
 # packages
 using DrWatson
-using Plots
-plotlyjs();
+# using Plots
+# plotlyjs();
 using Flux
 using Distributions
 using LinearAlgebra
@@ -26,7 +26,6 @@ include(scriptsdir("functions.jl"))
 include(scriptsdir("run_me.jl"))
 
 # DATA
-#pulsars = CSV.read(datadir("datasets","htru2.csv"))
 kdd = CSV.read(datadir("datasets","kdd10_http.csv"))
 
 # manipulation with data 
@@ -37,7 +36,18 @@ ndat = size(dataset,1)
 normal_count = size(normal,1)
 anomaly_count = ndat - normal_count
 dataset2 = kdd[:,23:41] |> Array
-dataset3 = hcat(dataset,dataset2) # main dataset, 22 entries, all continuous  
+dataset3 = hcat(dataset,dataset2) # main dataset, 22 entries, all continuous, all data (normal+anomalies)
+
+# only normal data for training - only the first 20000?
+dat_norm = normal[1:20000,[:duration,:src_bytes,:dst_bytes]]
+dat_norm2 = normal[1:20000,23:41]
+DT = hcat(dat_norm,dat_norm2) |> Array 
+
+# training data
+dataT = [ dataset3[i,:] for i in 1:ndat] # all data - dataset as vectors in a vector
+dataN = [DT[i,:] for i in 1:20000]       # only normal data 
+# data_train = zip(dataT,)               # data that fits to Flux.train! function 
+data_train = zip(dataN,)
 
 # get labels
 labels = zeros(ndat)
@@ -48,11 +58,6 @@ for i in 1:ndat
         labels_rev[i] = 0
     end
 end
-
 # labels_bool = labels |> BitVector # in case we needed labels in bool format  
-
-# training data
-dataT = [ dataset3[i,:] for i in 1:ndat] # dataset as vectors in a vector  
-data_train = zip(dataT,)                 # data that fits to Flux.train! function 
 
 println("Data imported and ready :)")
