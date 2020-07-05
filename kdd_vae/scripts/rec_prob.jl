@@ -2,8 +2,8 @@
 nx = 22
 nh = 30
 nz = 8
-s = 1
-ep = 5
+s = 0.5
+ep = 400
 
 # create the neural networks
 A, μ, logs = Dense(nx, nh, σ), Dense(nh, nz), Dense(nh, nz);
@@ -23,18 +23,25 @@ end
 L = 20
 function rec_prob(x)
     HID = A(x);
-    zsample = hcat([rand(MvNormal(μ(HID),los(HID))) for i in 1:L]...)
+    zsample = hcat([rand(MvNormal(μ(HID),logs(HID))) for i in 1:L]...)
     E = hcat([f(zsample[:,i]) for i in 1:L]...)
     1/L*sum([pdf(MvNormal(E[:,i],s*I),x) for i in 1:L])
 end
 
+function rec_prob(x)
+    HID = A(x);
+    zsample = hcat([z(μ(HID), logs(HID)) for i in 1:L]...)
+    E = hcat([f(zsample[:,i]) for i in 1:L]...)
+    1/L*sum([pdf(MvNormal(E[:,i],s*I),x) for i in 1:L])
+end
+L = 20
 function rec(x)
     HID = A(x);
     zsample = hcat([z(μ(HID), logs(HID)) for i in 1:L]...)
     1 / L * sum([0.5 / s * sum((x .- f(zsample[:,i])).^2) for i in 1:L])
 end
 
-
+RR = rec_prob.(dataT)
 
 # saving the results
 FPR = []

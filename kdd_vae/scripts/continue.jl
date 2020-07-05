@@ -1,20 +1,20 @@
-# data load
+# continue training
 include(scriptsdir("init_kdd.jl"))
+model = BSON.load(datadir("final/final_model_auc_end=0.986_ep=800_s=1000.bson"))
+
+@unpack ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s = model
+k = ep + 1
+ep = ep + 500
 
 # parameters
 nx = 22
 nh = 30
 nz = 8
-s = 10
-ep = 400
+s = 1000
 
-# create the neural networks
-A, μ, logs = Dense(nx, nh, σ), Dense(nh, nz), Dense(nh, nz);
-f = Chain(Dense(nz, nh, σ), Dense(nh, nx));
 z(μ, logs) = μ .+ exp.(logs) .* randn(size(μ));
 KL(μ, logs) = 0.5 * sum((exp.(logs)).^2 .+ μ.^2 .- 1.0 .- 2. * logs);
 ps = Flux.params(A, μ, logs, f);
-opt = ADAM(0.01)
 
 # loss function
 function loss(x)
@@ -30,18 +30,19 @@ auc_max, k_max = missing, missing
 auc_progress = []
 
 # training procedure
+printstyled("Experiment started...\n", bold = true, color = :gold)
 l_prev = loss(dataT[1])
-@time for i in 1:ep
+@time for i in k:ep
     Flux.train!(loss, ps, data_train, opt)
     L = loss.(dataT)
     global l = loss(dataT[1])
     if isnan(l)
-        "loss diverged into NaN, training terminated..."
+        println("loss diverged into NaN, training terminated...")
         break
     end
     fpr, tpr = roccurve(L, labels)
     auc1 = auc(fpr, tpr)
-    if i > 1
+    if i > k
           # this way we save the best model there is throughtout training process 
         if auc1 > maximum(auc_progress)
             global FPR = fpr
@@ -59,7 +60,6 @@ l_prev = loss(dataT[1])
     println("Epoch: $i, loss:$l, auc=$auc1, auc_max=$auc_max")
     global auc_progress = vcat(auc_progress, auc1)
 end
-
 
 println("Results: \n maximum AUC = $auc_max")
 

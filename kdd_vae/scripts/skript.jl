@@ -23,7 +23,7 @@ res = collect_results(datadir("results"),black_list=bl)
 
 filtered = filter(:η => x -> x == 0.01,dropmissing(res,:auc_max))
 filtered = filter([:η, :opts] => (x, y) -> x == 0.01 && y == ADAM ,dropmissing(res,:auc_max))
-filter(:auc_max => x -> x > 0.99,dropmissing(res,:auc_max))
+flt = filter(:auc_max => x -> x > 0.99,dropmissing(res,:auc_max))
 filter(:auc_max => x -> x > 0.99,dropmissing(filtered,:auc_max))
 
 avg = evaluate_averages(res,:nh,:auc_max)

@@ -1,12 +1,12 @@
 # data load
-include(scriptsdir("init_kdd.jl"))
+include(scriptsdir("init_pulsars.jl"))
 
 # parameters
-nx = 22
+nx = 8
 nh = 30
-nz = 8
-s = 10
-ep = 400
+nz = 5
+s = 0.5
+ep = 800
 
 # create the neural networks
 A, μ, logs = Dense(nx, nh, σ), Dense(nh, nz), Dense(nh, nz);
@@ -28,15 +28,20 @@ FPR = []
 TPR = []
 auc_max, k_max = missing, missing
 auc_progress = []
+saved_model = @dict() 
+
+FPR_end = [] 
+TPR_end = [] 
+auc_end = missing
 
 # training procedure
 l_prev = loss(dataT[1])
-@time for i in 1:ep
+@time for i in 401:ep
     Flux.train!(loss, ps, data_train, opt)
     L = loss.(dataT)
     global l = loss(dataT[1])
     if isnan(l)
-        "loss diverged into NaN, training terminated..."
+        println("loss diverged into NaN, training terminated...")
         break
     end
     fpr, tpr = roccurve(L, labels)
