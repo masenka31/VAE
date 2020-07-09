@@ -1,24 +1,25 @@
 """
 Check the training epochs!!!
+And what is saved!
 """
 
 # load data
 include(scriptsdir("init_pulsars.jl"))
 
 """
-model = BSON.load(datadir("WAE_final/final_wae_auc_end=0.984_c=1_ep=40_n_sample=200_s=1.bson"))
-@unpack ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s,c,n_sample = model
+model = BSON.load(datadir("WAE_final/final_wae_gaussian_auc_end=0.874_ep=25_n_sample=200_s=1_γ=0.01.bson"))
+@unpack ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s,γ, n_sample = model
 """ 
 
 # parameters
 nx = 8
 nz = 4
 nh = 30;
-# γ = 0.01
-c = 1
+γ = 0.01
+# c = 1
 s = 1
 n_sample = 200
-ep = 25
+ep = 50
 
 # model 
 opt = Flux.ADAM(1e-2)
@@ -26,7 +27,8 @@ A, μ, logs = Dense(nx, nh, σ), Dense(nh, nz), Dense(nh, nz)
 f = Chain(Dense(nz,nh,σ),Dense(nh,nx))
 z(μ, logs) = μ .+ exp.(logs) .* randn(size(μ))
 KL(μ, logs) = 0.5 * sum((exp.(logs)).^2 .+ μ.^2 .- 1.0 .- 2. *logs)
-kernel = IMQKernel(c)
+# kernel = IMQKernel(c)
+kernel = GaussianKernel(γ)
 ps = Flux.params(A, μ, logs, f)
 
 # loss function 
@@ -40,7 +42,7 @@ end
 
 # training procedure
 l_prev = loss(dataT[1])
-@time for i in 1:ep
+@time for i in 26:ep
     Flux.train!(loss, ps, data_train, opt)
     global l = loss(dataT[1])
     if isnan(l)
@@ -61,8 +63,8 @@ end
 println("Results: \n maximum AUC = $auc_end")
 
 # save the final model after specified number of epochs
-final_model = @dict(ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s,c,n_sample)
-safesave(datadir("WAE_final", savename("final_wae", final_model, "bson")), final_model)
+final_model = @dict(ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s,γ,n_sample)
+safesave(datadir("WAE_final", savename("final_wae_gaussian", final_model, "bson")), final_model)
 
 printstyled("Current experiment completed.\n", bold = true, color = :cyan) 
 
