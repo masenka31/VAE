@@ -5,15 +5,8 @@ using DrWatson
 @quickactivate("components")
 """
 
-using Plots
-using Flux
-using Distributions
-using LinearAlgebra
-# using LaTeXStrings
-# pgfplotsx()
-
 include(scriptsdir("funkce.jl"))
-include(scriptsdir("init_kdd.jl"))
+include(scriptsdir("KDD/init_kdd.jl"))
 
 # initialize network
 nx = 22
@@ -21,9 +14,10 @@ nz = 10
 nh = 30
 comp = 10
 α = [1 / comp for i in 1:comp] # no prior information
-s = 0.03
+s = 1
 b = 1 / s
 opt = ADAM(0.01)
+ep = 30
 
 A = [Dense(nx, nh, σ) for i in 1:comp]
 μ = [Dense(nh, nz) for i in 1:comp]
@@ -52,7 +46,7 @@ l_prev = loss(dataT[1])
         "loss diverged into NaN, training terminated..."
         break
     end
-    if i%20 == 0
+    if i%5 == 0
         L = loss.(dataT)
         fpr, tpr = roccurve(L, labels)
         auc1 = auc(fpr, tpr)

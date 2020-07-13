@@ -256,6 +256,14 @@ git-tree-sha1 = "39280e5e29ee5f72dc23eb42a8aae8dcaecbe384"
 uuid = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 version = "1.13.2"
 
+[[EvalCurves]]
+deps = ["LinearAlgebra", "StatsBase"]
+git-tree-sha1 = "2546728a61636415e40b65ef7e48133e69358167"
+repo-rev = "master"
+repo-url = "https://github.com/vitskvara/EvalCurves.jl"
+uuid = "f38dcc0d-dce9-59d8-8cbc-ed225c093724"
+version = "0.0.0"
+
 [[ExprTools]]
 git-tree-sha1 = "6f0517056812fd6aa3af23d4b70d5325a2ae4e95"
 uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
