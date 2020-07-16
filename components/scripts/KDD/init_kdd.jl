@@ -34,15 +34,25 @@ dataset2 = kdd[:,23:41] |> Array
 dataset3 = hcat(dataset,dataset2) # main dataset, 22 entries, all continuous, all data (normal+anomalies)
 
 # only normal data for training - only the first 20000?
-dat_norm = normal[1:20000,[:duration,:src_bytes,:dst_bytes]]
-dat_norm2 = normal[1:20000,23:41]
-DT = hcat(dat_norm,dat_norm2) |> Array 
+dat_norm1 = normal[1:normal_count,[:duration,:src_bytes,:dst_bytes]]
+dat_norm2 = normal[1:normal_count,23:41]
+dat_norm = hcat(dat_norm1,dat_norm2) |> Array 
+
+# only anomaly data
+anomaly = filter(:label => x -> x != "normal.",kdd)
+adat1 = anomaly[!,[:duration,:src_bytes,:dst_bytes]]
+adat2 = anomaly[:,23:41]
+dat_anomaly = hcat(adat1,adat2) |> Array  
 
 # training data
+train_size = 20000
 dataT = [ dataset3[i,:] for i in 1:ndat] # all data - dataset as vectors in a vector
-dataN = [DT[i,:] for i in 1:20000]       # only normal data 
+dataN_train = [dat_norm[i,:] for i in 1:train_size]  # only normal data (train_size of data)
+dataN_test = [dat_norm[i,:] for i in train_size+1:normal_count]
+dataA = [dat_anomaly[i,:] for i in 1:anomaly_count] 
+data_test = vcat(dataN_test,dataA)
 # data_train = zip(dataT,)               # data that fits to Flux.train! function 
-data_train = zip(dataN,)
+data_train = zip(dataN_train)
 
 # get labels
 labels = zeros(ndat)
@@ -54,5 +64,6 @@ for i in 1:ndat
     end
 end
 # labels_bool = labels |> BitVector # in case we needed labels in bool format  
+test_labels = vcat(zeros(normal_count-train_size),ones(anomaly_count))
 
 println("Data imported and ready :)")

@@ -4,7 +4,20 @@ generating new data and training model.
 """
 # TRAINING FUNCTIONS
 # count labels for specific data point
+# NaN values correction 
 function lik(x)
+    HID = [A[i](x) for i in 1:comp]
+    zs = [z(μ[i](HID[i]), logs[i](HID[i])) for i in 1:comp]
+    expo = map(1:comp) do i
+        temp = f[i](zs[i])
+        vc = -sum((x .- temp).^2)
+    end
+    lbl = softmax(-expo .* α[:])
+    return lbl
+end
+
+# lik function without NaN values correction
+function _lik(x)
     HID = [A[i](x) for i in 1:comp]
     zs = [z(μ[i](HID[i]), logs[i](HID[i])) for i in 1:comp]
     expo = map(1:comp) do i
