@@ -12,13 +12,14 @@ include(scriptsdir("init_kdd.jl"))
 nx = 22
 nh1 = 40
 nh2 = 20
-nz = 8
+nh = 2
+nz = 2
 s = 1
 ep = 400
 
 # create the neural networks
-A, μ, logs = Dense(nx, nh1, σ), Chain(Dense(nh1, nh2, σ),Dense(nh2,nz)), Chain(Dense(nh1, nh2, σ),Dense(nh2,nz));
-f = Chain(Dense(nz, nh2, σ), Dense(nh2,nh1,σ), Dense(nh1, nx));
+A, μ, logs = Dense(nx, nh, σ), Dense(nh,nz), Dense(nh,nz)
+f = Chain(Dense(nz, nh, σ), Dense(nh, nx));
 z(μ, logs) = μ .+ exp.(logs) .* randn(size(μ));
 KL(μ, logs) = 0.5 * sum((exp.(logs)).^2 .+ μ.^2 .- 1.0 .- 2. * logs);
 ps = Flux.params(A, μ, logs, f);
@@ -72,15 +73,15 @@ end
 println("Results: \n maximum AUC = $auc_max")
 
 # save the final model after specified number of epochs
-final_model = @dict(ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s)
-safesave(datadir("final", savename("final_model", final_model, "bson")), final_model)
+final_model = @dict(ep,A,μ,logs,f,opt,FPR_end,TPR_end,auc_end,s,nh,nz)
+safesave(datadir("final", savename("final_model_swish(f)", final_model, "bson")), final_model)
 
 # save the best model during training and the best results
 if !isempty(saved_model)
     @unpack A, μ, logs, f, opt = saved_model
-    # result = @dict(auc_max,k_max,FPR,TPR,auc_progress,A,μ,logs,f,opt,nx,nz,nh,s)
-    result = @dict(auc_max,k_max,FPR,TPR,auc_progress,A,μ,logs,f,opt,nx,nz,nh1,nh2,s)
-    safesave(datadir("best", savename("best_model", result, "bson")), result)
+    result = @dict(auc_max,k_max,FPR,TPR,auc_progress,A,μ,logs,f,opt,nx,nz,nh,s)
+    # result = @dict(auc_max,k_max,FPR,TPR,auc_progress,A,μ,logs,f,opt,nx,nz,nh1,nh2,s)
+    safesave(datadir("best", savename("best_model_swish(f)", result, "bson")), result)
 end
 
 printstyled("Current experiment completed.\n", bold = true, color = :cyan) 
