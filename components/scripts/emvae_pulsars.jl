@@ -8,18 +8,19 @@ using DrWatson
 # include predefined functions
 include(scriptsdir("funkce.jl"))
 # load data
-include(scriptsdir("pulsars/init_pulsars.jl"))
+include(scriptsdir("init_pulsars.jl"))
 
 # initialize network
 nx = 8
-nz = 4
+nz = 8
 nh = 30
 comp = 5
 α = [1 / comp for i in 1:comp] # no prior information
-s = 10
+s = 0.5
 b = 1 / s
-opt = ADAM(0.01)
-ep = 100
+η = 0.0001 
+opt = ADAM(η)
+ep = 300
 
 A = [Dense(nx, nh, sigmoid) for i in 1:comp]
 μ = [Dense(nh, nz) for i in 1:comp]
@@ -39,29 +40,29 @@ end
 # initial computation of labels and α
 global LI = lik_n(dataN_train)                         # count the l_ik matrix
 global α = sum(LI, dims = 1) / train_size     # count α
-x = dataN_train[1] 
+x = dataN[1] 
 l_prev = loss(x)
 
 # training procedure
 @time for i in 1:ep
     Flux.train!(loss, ps, data_train, opt)
-    global LI = lik_n(dataN_train)                            # count the l_ik matrix
-    global α = sum(LI, dims = 1) / train_size       # count α
+    global LI = lik_n(dataN)                            # count the l_ik matrix
+    global α = sum(LI, dims = 1) / normal_count       # count α
     global l = loss(x)
     if isnan(l)
         println("loss diverged into NaN, training terminated...")
         break
     end
-    LN = loss.(dataN_train)
+    LN = loss.(dataN)
     LA = loss.(dataA)
-    avg_norm = sum(LN) / train_size
-    avg_an = sum(LA) / anomaly_count
+    avg_norm = mean(LN)
+    avg_an = mean(LA)
     if i%5 == 0
-        L = loss.(data_test)
-        fpr, tpr = roccurve(L, test_labels)
+        L = loss.(dataT)
+        fpr, tpr = roccurve(L, labels)
         auc1 = auc(fpr, tpr)
-        final_model = @dict(i,A,μ,logs,f,opt,fpr,tpr,auc1,s,α)
-        safesave(datadir("pulsars", savename("test_vs_train-2", final_model, "bson")), final_model)
+        final_model = @dict(i,A,μ,logs,f,opt,fpr,tpr,auc1,s,α,comp)
+        safesave(datadir("pulsars-ALL_DATA", savename("run-hard-6", final_model, "bson")), final_model)
         println("AUC: $(round(auc1,digits=4))")
     end
     n_vec = sum(round.(LI),dims=1)
@@ -73,3 +74,4 @@ end
 # safesave(datadir("WAE_final", savename("final_wae_gaussian", final_model, "bson")), final_model)
 
 printstyled("Current experiment completed.\n", bold = true, color = :cyan)
+

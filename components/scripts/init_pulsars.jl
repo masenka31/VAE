@@ -1,8 +1,3 @@
-"""
-using DrWatson
-@quickactivate("components")
-"""
-
 # packages
 using DrWatson
 using Flux
@@ -39,8 +34,10 @@ labels = pulsars[:,:label]
 dataT = [dataset[i,:] for i in 1:ndat ]                                 # whole dataset 
 dataN_train = [dat_norm_train[i,:] for i in 1:train_size]               # train dataset 
 dataN_test = [dat_norm_test[i,:] for i in 1:normal_count-train_size]    # test normal
+dataN = vcat(dataN_train,dataN_test)
 # data_train = zip(dataT,)  # data that fits to Flux.train! function 
-data_train = zip(dataN_train,)
+data_train = zip(dataN,)
+# data_train = zip(dataN_train,)
 
 AN = anomaly[:,Not(:label)] |> Array                                    # anomalies data
 dataA = [AN[i,:] for i in 1:anomaly_count]                              # anomalies for loss  

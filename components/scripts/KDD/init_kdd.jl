@@ -7,11 +7,8 @@ using DrWatson
 include(scriptsdir("init_kdd.jl"))
 """
 
-# inside kdd_vae project 
 # packages
 using DrWatson
-# using Plots
-# plotlyjs();
 using Flux
 using Distributions
 using LinearAlgebra
@@ -46,12 +43,12 @@ dat_anomaly = hcat(adat1,adat2) |> Array
 
 # training data
 train_size = 20000
-dataT = [ dataset3[i,:] for i in 1:ndat] # all data - dataset as vectors in a vector
-dataN_train = [dat_norm[i,:] for i in 1:train_size]  # only normal data (train_size of data)
-dataN_test = [dat_norm[i,:] for i in train_size+1:normal_count]
-dataA = [dat_anomaly[i,:] for i in 1:anomaly_count] 
-data_test = vcat(dataN_test,dataA)
-# data_train = zip(dataT,)               # data that fits to Flux.train! function 
+dataT = [ dataset3[i,:] for i in 1:ndat]                            # all data - dataset as vectors in a vector
+dataN_train = [dat_norm[i,:] for i in 1:train_size]                 # only normal data (train_size of data)
+dataN_test = [dat_norm[i,:] for i in train_size+1:normal_count]     # normal test data 
+dataA = [dat_anomaly[i,:] for i in 1:anomaly_count]                 # anomaly data
+data_test = vcat(dataN_test,dataA)                                  # all test data
+# data_train = zip(dataT,)                                          # data that fits to Flux.train! function 
 data_train = zip(dataN_train)
 
 # get labels

@@ -3,8 +3,8 @@ include(scriptsdir("init_pulsars.jl"))
 using IPMeasures
 
 """
-model = BSON.load(datadir("KDD_test_WAE_gauss/test_vs_train-2_auc1=0.985_i=30_s=1.bson"))
-@unpack i,A,μ,logs,f,opt,fpr,tpr,auc1,s = model
+model = BSON.load(datadir("ALL_DATA_WAE(IMQ)/run-hard-2_auc1=0.914_c=1_i=300_s=1_η=0.bson"))
+@unpack i,A,μ,logs,f,opt,fpr,tpr,auc1,s,η,c = model
 """
 
 # parameters
@@ -12,10 +12,10 @@ nx = 8
 nz = 2
 nh = 2;
 γ = 0.01
-# c = 1
+c = 1
 s = 1
 n_sample = 100
-ep = 100
+ep = 300
 η = 0.0001
 
 # model 
@@ -24,8 +24,8 @@ A, μ, logs = Dense(nx, nh, σ), Dense(nh, nz), Dense(nh, nz)
 f = Chain(Dense(nz,nh,σ),Dense(nh,nx))
 z(μ, logs) = μ .+ exp.(logs) .* randn(size(μ))
 KL(μ, logs) = 0.5 * sum((exp.(logs)).^2 .+ μ.^2 .- 1.0 .- 2. *logs)
-# kernel = IMQKernel(c)
-kernel = GaussianKernel(γ)
+kernel = IMQKernel(c)
+# kernel = GaussianKernel(γ)
 ps = Flux.params(A, μ, logs, f)
 
 # loss function 
@@ -64,10 +64,8 @@ x = dataN_train[1]
         L = rec_loss.(dataT)
         fpr, tpr = roccurve(L, labels)
         auc1 = auc(fpr,tpr)
-        if i%20 == 0
-            final_model = @dict(i,A,μ,logs,f,opt,fpr,tpr,auc1,s,η)
-            safesave(datadir("ALL_DATA_WAE(G)", savename("run-1", final_model, "bson")), final_model)
-        end
+        final_model = @dict(i,A,μ,logs,f,opt,fpr,tpr,auc1,s,η,c)
+        safesave(datadir("ALL_DATA_WAE(IMQ)", savename("run-6", final_model, "bson")), final_model)
         println("Epoch: $i, l: $(round(l)), LN: $(round(avg_norm)), LA: $(round(avg_an))")
         println("AUC: $auc1")
     end

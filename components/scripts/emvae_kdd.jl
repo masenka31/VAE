@@ -19,9 +19,9 @@ nz = 8
 nh = 30
 comp = 5
 α = [1 / comp for i in 1:comp] # no prior information
-s = 10
+s = 1
 b = 1 / s
-ep = 50
+ep = 200
 
 opt = ADAM(0.01)
 A = [Dense(nx, nh, σ) for i in 1:comp]

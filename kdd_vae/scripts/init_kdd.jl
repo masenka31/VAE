@@ -49,10 +49,11 @@ train_size = 20000
 dataT = [ dataset3[i,:] for i in 1:ndat] # all data - dataset as vectors in a vector
 dataN_train = [dat_norm[i,:] for i in 1:train_size]  # only normal data (train_size of data)
 dataN_test = [dat_norm[i,:] for i in train_size+1:normal_count]
+dataN = vcat(dataN_train,dataN_test)
 dataA = [dat_anomaly[i,:] for i in 1:anomaly_count] 
 data_test = vcat(dataN_test,dataA)
 # data_train = zip(dataT,)               # data that fits to Flux.train! function 
-data_train = zip(dataN_train)
+data_train = zip(dataN,)
 
 # get labels
 labels = zeros(ndat)
