@@ -1,0 +1,15 @@
+name = "VAE_BP"
+
+[deps]
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
+EvalCurves = "f38dcc0d-dce9-59d8-8cbc-ed225c093724"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+IPMeasures = "d7dc6e0c-a753-11e8-227e-b362679e0b17"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[compat]
+julia = "1.4.2"
